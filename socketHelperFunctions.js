@@ -1,9 +1,9 @@
-module.exports = (io, socket, socketObj) => {
+module.exports = (io, socket, socketChatObj) => {
 
-    console.log("TEST:", socketObj);
+    console.log("socketHelperFunctions:", "socketChatObj:",socketChatObj);
 
     // const countObject = require('countObject');
-    const users = require("./socketHelperFunctions.js");
+    // const users = require("./socketHelperFunctions.js");
     const { v4: uuidv4 } = require('uuid');
 
     logNewUser = function (userObj){
@@ -14,10 +14,10 @@ module.exports = (io, socket, socketObj) => {
         user.socket_id = userObj.socket_id;
         user.first_connected_at = new Date().toISOString();
         user.last_connected_at = new Date().toISOString();
-        users[user.user_id] = user;
-        return users[user.user_id];
+        socketChatObj.activeUsers[user.user_id] = user;
+        return socketChatObj.activeUsers[user.user_id];
     }
-    getUUID = function () {
+    generateUUID = function () {
 
         return uuidv4();
         /* Fallback... */
@@ -26,28 +26,28 @@ module.exports = (io, socket, socketObj) => {
         // );
     }
     findUsers = function (matchKey, matchValue, returnKey) {
+        console.log("findUsers()",matchKey, matchValue, returnKey);
         matchingUsers = [];
-        // matchKey = "socket_id";
-        // matchValue = "o1vmmbCbbxEK1q-7AAAS";
 
-        for (let userKey in users) {
+        for (let userKey in socketChatObj.activeUsers) {
+        // console.log("Checking userKey:",userKey);
         // console.log(`users.${prop} = ${users[prop]}`);
         
-            for (let [key, value] of Object.entries(users[userKey])) {
-            // console.log(userKey, "---->", key, ":" , value);
+            for (let [key, value] of Object.entries(socketChatObj.activeUsers[userKey])) {
+            // console.log(userKey, "key:", key, "value:" , value);
             
                 if (key == matchKey){
-                    console.log(userKey, "---->", key, ":" , value);
-                    if (key == matchKey && value.toLowerCase() == matchValue){
+                    // console.log("key == matchKey", userKey, "---->", key, ":" , value);
+                    if (value == matchValue){
                         // Exact non-case-specific match
                         // If matchvalue = "", we will match users without a value
                         console.log("Match!");
-                        matchingUsers.push(users[userKey]);
+                        matchingUsers.push(socketChatObj.activeUsers[userKey]);
                     }
                     if (key == matchKey && matchValue == undefined){
                         // console.log("return all with this key existing");
                         // matchingUsers.push(users[userKey]);
-                        returnOnlyRequestedElem(users[userKey])
+                        returnOnlyRequestedElem(socketChatObj.activeUsers[userKey])
                     }
                 }
             }
@@ -67,7 +67,7 @@ module.exports = (io, socket, socketObj) => {
     }
     getUserRooms = function (userId) {
     }
-    getUsersArray = function(users) {
+    getUsersArray = function() {
         const count = io.engine.clientsCount;
         // may or may not be similar to the count of Socket instances in the main namespace, depending on your usage
         const count2 = io.of("/").sockets.size;
@@ -76,10 +76,10 @@ module.exports = (io, socket, socketObj) => {
         // const socketsArray = io.of("/").sockets;
 
         console.log("---- getUsersArray() ------------------");
-        console.log("Users Array:", Object.keys(users).length);
+        console.log("Users Array:", Object.keys(socketChatObj.activeUsers).length);
         console.log("io.engine.clientsCount:", count);
         console.log("socket instances in namespace:", count2);
-        console.log("Sockets:",socketObj.fetchSockets.length,Object.keys(socketObj.fetchSockets).length)
+        console.log("Sockets:",socketChatObj.fetchSockets.length,Object.keys(socketChatObj.fetchSockets).length)
         console.log("io.sockets.adapter.rooms:\n",io.sockets.adapter.rooms);
         console.log("---------------------------------------");
     }

@@ -1,3 +1,15 @@
+//  nodemon app.js
+
+console.log("\n\n\n\n\n");
+console.log("-------------------------------");
+console.log(" S T A R T I N G   N O D E J S ");
+console.log(" > $ nodemon app.js");
+console.log("-------------------------------");
+console.log("\n\n\n");
+
+/* SET UP SERVER - Source: https://socket.io/get-started/chat */
+
+
 const express = require("express");
 const app = express();
 const path = require("path");
@@ -26,8 +38,8 @@ const connectionHandlers = require("./connectionHandler");
 const socketHelperFunctions = require("./socketHelperFunctions.js");
 
 const onConnection = (socket) => {
-    socketHelperFunctions(io, socket, socketObj);
-    connectionHandlers(io, socket);
+    socketHelperFunctions(io, socket, socketChatObj);
+    connectionHandlers(io, socket, socketChatObj);
     // chatEventHandlers(io, socket);
 };
 
@@ -42,16 +54,18 @@ httpServer.listen(PORT, () => console.log(`Listening on ${PORT}`));
 /* Handling vars and objects for modules */
 /* TODO: Move this out of the index.js file */
 
-const socketObj = {};
-socketObj.fetchSockets = io.fetchSockets();
-socketObj.count = io.engine.clientsCount;
-socketObj.count2 = io.of("/").sockets.size;
+const socketChatObj = {};
+socketChatObj.activeUsers = {};
+socketChatObj.fetchSockets = io.fetchSockets();
+socketChatObj.count = io.engine.clientsCount;
+socketChatObj.count2 = io.of("/").sockets.size;
 
 // export default countObject;
 
 console.log("-------------------------------------");
-console.log("io.engine.clientsCount:", socketObj.count);
-console.log("socket instances in namespace:", socketObj.count2);
-console.log("Sockets:", socketObj.fetchSockets.length, Object.keys(socketObj.fetchSockets).length);
+console.log("socketChatObj.activeUsers",Object.keys(socketChatObj.activeUsers).length,socketChatObj.activeUsers );
+console.log("io.engine.clientsCount:", socketChatObj.count);
+console.log("socket instances in namespace:", socketChatObj.count2);
+console.log("Sockets:", socketChatObj.fetchSockets.length, Object.keys(socketChatObj.fetchSockets).length);
 console.log("io.sockets.adapter.rooms:\n", io.sockets.adapter.rooms);
 console.log("-------------------------------------");
